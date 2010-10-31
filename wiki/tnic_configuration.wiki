@@ -1,8 +1,9 @@
-#summary One-sentence summary of this page.
+#summary This article describes the configuration preferences for tnic, and how to set them.
 
-= Introduction =
+= Adaptive Configuration =
 
-Add your content here.
+TNIC is designed to utilize a variety of platforms to accomplish its goal of
+developer-friendly modular computation. As such, 
 
 
 = Details =

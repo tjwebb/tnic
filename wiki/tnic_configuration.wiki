@@ -2,13 +2,29 @@
 
 = Adaptive Configuration =
 
-TNIC is designed to utilize a variety of platforms to accomplish its goal of
-developer-friendly modular computation. As such, 
+tnic is designed to run on a variety of platforms to accomplish its goal of
+developer-friendly modular computation. As such, tnic is able to adapt, at
+runtime, to many different hosting environments and persistence layers. 
+Currently, tnic supports the following environments "out-of-the-box":
+    * The Google App Engine
+    * Linux + Tomcat + Java + MySQL
+    * (coming soon) Linux + Apache + MySQL + PHP
+For Java servlet environments such as the App Engine and Tomcat, tnic utilizes
+the standard servlet init() method (per the Java Servlet API) to set
+common configuration variables during runtime. Some of the settings that are
+determined during runtime are:
+    * The type of caching to utilize
+    * How to start/manage threads
+    * How to manage http connections
+The system itself determines how to handle the above components during runtime.
+In this way, tnic "adaptively" configures itself in many respects, lending
+itself to easy portability to and from different systems and platforms. tnic can
+also adaptively configure certain persistence layers, such as App Engine + JDO
+and PHP + MySQL. Other persistence layers may require manual configuration, 
+explained in detail in the "Manual Configuration" section below.
 
+= Manual Configuration =
 
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+The primary things you will need to configure for your system manually:
+    * Persistence Layer, if not officially supported
+    * Load balancing policies

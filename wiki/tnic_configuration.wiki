@@ -27,7 +27,7 @@ explained in detail in the "Manual Configuration" section below.
 
 The primary things you will need to configure for your system manually:
     * Persistence Layer, if not officially supported
-    * Load balancing policies *(required)*
+    * Load balancing policies
 
 == Persistence Layer ==
 

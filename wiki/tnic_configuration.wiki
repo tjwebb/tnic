@@ -27,4 +27,18 @@ explained in detail in the "Manual Configuration" section below.
 
 The primary things you will need to configure for your system manually:
     * Persistence Layer, if not officially supported
-    * Load balancing policies
+    * Load balancing policies *(required)*
+
+== Persistence Layer ==
+
+If you want or need to use a persistence layer other than the Google App Engine
+or MySQL, you will need to write the bindings yourself. That is, you will need
+to implement the *com.tnic.db.Datastore* interface for Java environments, or 
+implement the *com.tnic.db.Datastore* object interface for PHP environments.
+
+== Load Balancing Policies ==
+
+tnic detects the resources and capacities of your system and constructs a load
+balancing policy based on this information. If you would like to customize this
+policy, reference the wiki article 'How to Configure tnic Policies'
+

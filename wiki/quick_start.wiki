@@ -16,30 +16,49 @@ numbers in the fibonacci sequence. This program is split into two modules
 and a supervisor. Module 1 computes the fibonacci sequence, module 2
 detects a prime number, and the supervisor begins the execution and analyzes
 the result once the program is finished. The supervisor defines a series of
-guards (http://en.wikipedia.org/wiki/Guard_(computing)) that define the 
-flow of logic.
+guards [ http://en.wikipedia.org/wiki/Guard_(computing) ] that define the 
+flow of logic. In TNIC, "supervisor", "join", and "fail" are protected
+functions, in that these functions are treated specially by the system. This
+special treatment is described below in How To Write A Supervisor. The example
+below is in Javascript.
 
+=== Example Code ===
+
+==== Supervisor ====
 {{{
     /**
      * com.tnic.example.supervisor
      * Detects all prime numbers in the fibonacci sequence
      */
     namespace("com.tnic.example");
-    function guards () {
+    function supervisor (state) {
+        if (state !== null && state.results["com.tnic.example.fib"] > 100) {
+            return false;
+        }
+        else if (state !== null) {
+            return true;
+        }
         return {
+            "com.tnic.example.supervisor" : {
+                guard : [ "com.tnic.example.prime", "com.tnic.example.fib" ],
+            }
             "com.tnic.example.fib" : {
-                
+                guard : [ "com.tnic.example.supervisor" ],
+                cond  : function (z) { return z; },
             },
             "com.tnic.example.prime" : {
-                pre : "com.tnic.example.fib"
+                guard : [ "com.tnic.example.fib" ],
             }
         };
     }
-    
-    function join () {
+    function join (state) {
         print ("The fibonacci primes < "+ n +" are: "+ result.toSource());
     }
+    function fail (state) {
+        print ("The execution of this program timed out");
+    }
 }}}
+==== Fibonacci Module ====
 {{{
     /**
      * com.tnic.example.fib
@@ -49,9 +68,10 @@ flow of logic.
      */
     namespace("com.tnic.example");
     function fib (p1, p2) {
-        return (!(p1 || p2)) ? 1 : p1 + p2;
+        return !(p1 || p2) ? 1 : p1 + p2;
     }
 }}}
+==== Prime Number Validator Module ====
 {{{
     /**
      * com.tnic.example.prime
@@ -67,5 +87,70 @@ flow of logic.
      }
 }}}
 
+=== Explanation ===
+To summarize again, this program finds all fibonacci primes up to 100. The
+execution begins with the supervisor. Once the supervisor function is finished,
+the module or modules with the supervisor as their guard will be invoked. In
+this example, one module is guarding on the supervisor: the "fib" module. 
+Likewise, once "fib" is done executing, all modules guarded on "fib" will
+be invoked, i.e. "prime".
+
+Now, we'll go through each piece in detail so that you can begin writing your 
+own TNIC programs.
+
+==== Guard Object ====
+{{{ {
+    "moduleA" : {
+        guard : "moduleB"
+        cond  : function (z) { return (z == 1); }
+    }
+    ...
+} }}}
+The object is keyed by module, so here we are defining the guard template for
+"moduleA". with {{{ guard : "moduleB" }}}, we are instructing moduleA to wait
+until moduleB is finished executing, and to only run if {{{ (z == 1) }}} 
+evaluates to true. When defining a condition ("cond"), the argument z that is
+passed into the condition function is the result from the previous module--in
+this case, z is the result returned by moduleB. Generally, the supervisor will
+impose conditions on the modules that it guards on in order to halt the
+execution of the program at some point.
+Also since distributed systems are not guaranteed to have the resources to
+execute module logic at any particular point in time, a module will, by
+default, wait until resources are available to execute. Even though the
+distributed nature of the system is designed to avoid such situations, this
+is necessary to ensure orderly execution of TNIC programs.
+
+==== Logic Flow ====
 
 
+==== The State Variable ====
+
+==== Logic Flow ====
+
+==== How to Write A Supervisor ====
+
+=== Limitations ===
+In this section, we'll describe certain things that you _cannot_ do with TNIC,
+or things that TNIC is not optimized for.
+
+===== Sustained, single-threaded execution =====
+TNIC is not designed for extended periods of single-threaded execution; TNIC is
+designed for distributed computation, and therefore your program modules
+should be as small as possible while retaining distinction and description.
+It is for this reason that TNIC will kill a module if it executes for more than
+30 seconds. To be clear, a program comprised of many modules can run for as long
+as necessary, but the time-limit for an individual module is 30 seconds.
+
+===== Shared Data Structure =====
+As discussed earlier in this article, TNIC supervisors are in charge of
+maintaining program state. In the quick-start example, the supervisor receives
+a "state" variable as a function argument. The "state" variable structure has
+already been defined; its purpose is to place the responsibility of managing
+shared storage upon the supervisor. The modules should not attempt to create
+any global, shared data structures. All information passed between and shared
+among modules should be done in the function's return statement. Since all
+returned results are inserted into the "state" variable and passed onto the
+supervisor, the supervisor should therefore properly maintain any data
+structures that must transcend the execution of a single 
+supervisor-->module-->supervisor cycle. *Note:* no matter what, the modules
+will simply not have access to any global variables you attempt to share.

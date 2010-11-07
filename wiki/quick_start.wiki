@@ -1,0 +1,71 @@
+#summary Describes how to write your own TNIC programs.
+
+= How to build your own TNIC Program  =
+
+== Background ==
+
+TNIC allows the implementor to develop programs that can be automatically
+distributed among different computing resources. Another goal of the project is
+to allow rapid prototyping and fail-safe modification of programs during
+runtime. 
+
+== Quick-Start ==
+
+We'll start with a simple example of a tnic program that finds all prime
+numbers in the fibonacci sequence. This program is split into two modules
+and a supervisor. Module 1 computes the fibonacci sequence, module 2
+detects a prime number, and the supervisor begins the execution and analyzes
+the result once the program is finished. The supervisor defines a series of
+guards (http://en.wikipedia.org/wiki/Guard_(computing)) that define the 
+flow of logic.
+
+{{{
+    /**
+     * com.tnic.example.supervisor
+     * Detects all prime numbers in the fibonacci sequence
+     */
+    namespace("com.tnic.example");
+    function guards () {
+        return {
+            "com.tnic.example.fib" : {
+                
+            },
+            "com.tnic.example.prime" : {
+                pre : "com.tnic.example.fib"
+            }
+        };
+    }
+    
+    function join () {
+        print ("The fibonacci primes < "+ n +" are: "+ result.toSource());
+    }
+}}}
+{{{
+    /**
+     * com.tnic.example.fib
+     * Compute the next integer in the fibonacci sequence
+     * @param the previous number in the sequence
+     * @return the next number in the sequence
+     */
+    namespace("com.tnic.example");
+    function fib (p1, p2) {
+        return (!(p1 || p2)) ? 1 : p1 + p2;
+    }
+}}}
+{{{
+    /**
+     * com.tnic.example.prime
+     * Detects if an integer is prime
+     * @param the integer to process
+     * @return true if prime, false otherwise
+     */
+     namespace("com.tnic.example");
+     function prime (num) {
+        for (var i = 2; i <= sqrt(num); i += 2) {
+            if (num % i == 0) return false;
+        }
+     }
+}}}
+
+
+

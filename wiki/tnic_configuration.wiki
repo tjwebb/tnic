@@ -2,6 +2,8 @@
 
 = Adaptive Configuration =
 
+== Background ==
+
 tnic is designed to run on a variety of platforms to accomplish its goal of
 developer-friendly modular computation. As such, tnic is able to adapt, at
 runtime, to many different hosting environments and persistence layers. 
@@ -23,20 +25,25 @@ also adaptively configure certain persistence layers, such as App Engine + JDO
 and PHP + MySQL. Other persistence layers may require manual configuration, 
 explained in detail in the "Manual Configuration" section below.
 
-= Manual Configuration =
+== Low-level Documentation ==
+
+The code-level details on how this 'feature' is implemented are more thoroughly
+documented in the javadocs. A brief description follows:
+
+== Manual Configuration ==
 
 The primary things you will need to configure for your system manually:
     * Persistence Layer, if not officially supported
     * Load balancing policies
 
-== Persistence Layer ==
+=== Persistence Layer ===
 
 If you want or need to use a persistence layer other than the Google App Engine
 or MySQL, you will need to write the bindings yourself. That is, you will need
 to implement the *com.tnic.db.Datastore* interface for Java environments, or 
 implement the *com.tnic.db.Datastore* object interface for PHP environments.
 
-== Load Balancing Policies ==
+=== Load Balancing Policies ===
 
 tnic detects the resources and capacities of your system and constructs a load
 balancing policy based on this information. If you would like to customize this

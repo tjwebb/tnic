@@ -28,33 +28,41 @@ below is in Javascript.
 {{{
     /**
      * com.tnic.example.supervisor
-     * Detects all prime numbers in the fibonacci sequence
+     * Return all prime numbers in the fibonacci sequence
      */
     namespace("com.tnic.example");
-    function supervisor (state) {
-        if (state !== null && state.results["com.tnic.example.fib"] > 100) {
-            return false;
-        }
-        else if (state !== null) {
-            return true;
-        }
+    function init () {
         return {
-            "com.tnic.example.supervisor" : {
-                guard : [ "com.tnic.example.prime", "com.tnic.example.fib" ],
-            }
             "com.tnic.example.fib" : {
                 guard : [ "com.tnic.example.supervisor" ],
-                cond  : function (z) { return z; },
             },
             "com.tnic.example.prime" : {
                 guard : [ "com.tnic.example.fib" ],
+                cond  : function (z) { return (z < 10000); }
+            }
+            "space" : {
+                prime_list : [ ],
+                counter    : 0
             }
         };
     }
-    function join (state) {
-        print ("The fibonacci primes < "+ n +" are: "+ result.toSource());
+    function supervisor ($) {
+        var n = 100;
+        if (($) !== null && $.space.counter >= n) {
+            return false;
+        }
+        else if (space !== null) {
+            // if prime, add the fib output to prime_list
+            if ($.prime.result) {
+                $.space.prime_list.add(space.fib.result);
+            }
+            return $.space.counter++;
+        }
     }
-    function fail (state) {
+    function join (space) {
+        print ("The fibonacci primes < "+ n +" are: "+ $.prime_list.toSource());
+    }
+    function fail (space) {
         print ("The execution of this program timed out");
     }
 }}}
@@ -64,7 +72,7 @@ below is in Javascript.
      * com.tnic.example.fib
      * Compute the next integer in the fibonacci sequence
      * @param the previous number in the sequence
-     * @return the next number in the sequence
+     * @return {integer} the next number in the sequence
      */
     namespace("com.tnic.example");
     function fib (n)
@@ -132,11 +140,24 @@ distributed nature of the system is designed to avoid such situations, this
 is necessary to ensure orderly execution of TNIC programs.
 
 ==== Logic Flow ====
+The structure returned by init() defines the flow of logic. By default, the
+arguments passed into a function
 
-
-==== The State Variable ====
-
-==== Logic Flow ====
+==== The '$' Variable ====
+The special variable, which we call '$', is passed into the supervisor function
+on its initial invocation, and on each subsequent call if applicable. It acts
+as a state object for the supervisor. '$' will always contain the following
+properties:
+* space
+    * a shared object-space that is persisted between module invocations
+* ns
+    * the namespace that the supervisor belongs to
+* [module name].result
+    * in the example above, we check the $.fib.result object. This stores the 
+    value that 'fib' returned during it's last invocation. All modules in
+    the supervisor's namespace will be accessible in this way. Modules in other
+    namespaces are accessible by using the full namespace as the key, e.g.
+    $['com.tnic.packageA.moduleA'].result. 
 
 ==== How to Write A Supervisor ====
 
@@ -154,13 +175,13 @@ as necessary, but the time-limit for an individual module is 30 seconds.
 
 ==== Shared Data Structure ====
 As discussed earlier in this article, TNIC supervisors are in charge of
-maintaining program state. In the quick-start example, the supervisor receives
-a "state" variable as a function argument. The "state" variable structure has
+maintaining program space. In the quick-start example, the supervisor receives
+a "space" variable as a function argument. The "space" variable structure has
 already been defined; its purpose is to place the responsibility of managing
 shared storage upon the supervisor. The modules should not attempt to create
 any global, shared data structures. All information passed between and shared
-among modules should be done in the function's return statement. Since all
-returned results are inserted into the "state" variable and passed onto the
+among modules should be done in the function's return spacement. Since all
+returned results are inserted into the "space" variable and passed onto the
 supervisor, the supervisor should therefore properly maintain any data
 structures that must transcend the execution of a single 
 supervisor-->module-->supervisor cycle. *Note:* no matter what, the modules
@@ -171,9 +192,10 @@ Tail recursion is possible in TNIC programs, but must be implemented carefully.
 The trivial tail-recursion example in the above example is acceptable for small
 numbers. For the example above, however, we stop at n = 100. For tail-recursive
 functions, there are two main issues to consider:
-# Direct function calls to other functions are not distributed; that is, they
-    are run in the same thread and therefore do not take advantage of scaling
-# All threads are subject to the 30 second timeout, so it is important not to
-    be under the illusion that you are not subject to the timeout just because
-    you are calling another function. Since direct tail-recursion is
-    single-threaded, tail-recursion *is* subject to a 30-second timeout.
+
+* Direct function calls to other functions are not distributed; that is, they
+are run in the same thread and therefore do not take advantage of scaling
+* All threads are subject to the 30 second timeout, so it is important not to
+be under the illusion that you are not subject to the timeout just because
+you are calling another function. Since direct tail-recursion is
+single-threaded, tail-recursion *is* subject to a 30-second timeout.

@@ -10,8 +10,8 @@ through the development of loosely-coupled modules.
 = Quick-Start =
 We'll start with a simple example of a tnic program that finds all prime
 numbers in the fibonacci sequence. This program is split into two modules
-and a supervisor. Module 1 computes the fibonacci sequence, module 2
-detects a prime number, and the supervisor begins the execution and analyzes
+and a supervisor. Module `fib` computes the fibonacci sequence, module `prime`
+detects a prime number, and `supervisor` begins the execution and analyzes
 the result once the program is finished. The supervisor defines a series of
 guards [ http://en.wikipedia.org/wiki/Guard_(computing) ] that define the 
 flow of logic. The function names `supervisor`, `init`, and `join` are all

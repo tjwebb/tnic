@@ -1,10 +1,11 @@
-#summary Describes how to write your own TNIC programs.
+#summary Describes how to design and write your own TNIC programs.
 
 = Background =
 TNIC allows the implementor to develop programs that can be automatically
-distributed among different computing resources. Another goal of the project is
-to allow rapid prototyping and fail-safe modification of programs during
-runtime. 
+distributed among different computing resources. A desirable side-effect of
+tnic's design philosophy is that it allows rapid prototyping and fail-safe
+modification of programs during runtime, and it encourages software re-use
+through the development of loosely-coupled modules.
 
 = Quick-Start =
 We'll start with a simple example of a tnic program that finds all prime
@@ -13,10 +14,9 @@ and a supervisor. Module 1 computes the fibonacci sequence, module 2
 detects a prime number, and the supervisor begins the execution and analyzes
 the result once the program is finished. The supervisor defines a series of
 guards [ http://en.wikipedia.org/wiki/Guard_(computing) ] that define the 
-flow of logic. In TNIC, "supervisor", "join", and "fail" are protected
-functions, in that these functions are treated specially by the system. This
-special treatment is described below in How To Write A Supervisor. The example
-below is in Javascript.
+flow of logic. The function names `supervisor`, `init`, and `join` are all
+reserved function names in tnic, so no modules or functions can have this name.
+The example below is in Javascript.
 
 == Example Code ==
 
@@ -55,10 +55,7 @@ below is in Javascript.
         }
     }
     function join (space) {
-        print ("The fibonacci primes < "+ n +" are: "+ $.prime_list);
-    }
-    function fail (space) {
-        print ("The execution of this program timed out");
+        print ("The fibonacci primes < "+ n +" are: "+ $.space.prime_list);
     }
 }}}
 === Fibonacci Module ===
@@ -128,16 +125,15 @@ distributed nature of the system is designed to avoid such situations, this
 is necessary to ensure orderly execution of TNIC programs.
 
 == Logic Flow ==
-The structure returned by init() defines the flow of logic. By default, the
+The structure returned by `init()` defines the flow of logic. By default, the
 arguments passed into a function
-
 
 == How to Write A Supervisor ==
 The supervisor is a special module that directs the execution of its
-subordinate modules. The supervisor module consists of two functions: init()
-and supervisor().
+subordinate modules. The supervisor module consists of three functions: `init()`
+and `supervisor()`, and `join()`.
 
-=== init() function ===
+=== `init()` function ===
 The init function returns a hash-table object (aka JSON) that directs the flow
 of the program, and the items allowed in the object space. The table is keyed
 by module name. It is copied below for easy reference:
@@ -180,7 +176,7 @@ between each invocation of `supervisor()`. This design decision was made for
 illustration of this concept--in practice, `n` would probably be stored in 
 `$.space` as well.
 
-=== supervisor() function ===
+=== `supervisor()` function ===
 The supervisor handles all logic pertaining to beginning, ending, and/or
 looping the program. The supervisor is the first and last function to be 
 invoked in any tnic program. In addition, it is called once all modules are
@@ -224,6 +220,14 @@ properties:
 If `supervisor` returns true, the the program will execute following the flow
 defined in `init` via guard templates. If `supervisor` returns false, the
 program will terminate and the results in `$.space` will be saved.
+
+=== `join()` function ===
+`join` is invoked once the supervisor returns `false`. The name `join` was given 
+because it has a similar role as the POSIX `pthread_join` function. In tnic,
+however, there is no waiting on other threads to be done, so there is no actual
+barrier synchronization. The tnic `join` function is simple invoked once the 
+supervisor returns `false` because at this point all other modules have
+necessarily completed execution and have exited.
 
 
 = Limitations =

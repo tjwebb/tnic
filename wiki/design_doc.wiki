@@ -13,7 +13,7 @@ numbers in the fibonacci sequence. This program is split into two modules
 and a supervisor. Module `fib` computes the fibonacci sequence, module `prime`
 detects a prime number, and `supervisor` begins the execution and analyzes
 the result once the program is finished. The supervisor defines a series of
-guards (( http://en.wikipedia.org/wiki/Guard_(computing) )) that define the 
+guards (see: http://en.wikipedia.org/wiki/Guard_(computing) )that define the 
 flow of logic. The function names `supervisor`, `init`, and `join` are all
 reserved function names in tnic, so no modules or functions can have these
 names. The example below is in Javascript.
@@ -224,6 +224,9 @@ however, there is no waiting on other threads to be done, so there is no actual
 barrier synchronization. The tnic `join` function is simple invoked once the 
 supervisor returns `false` because at this point all other modules have
 necessarily completed execution and have exited.
+
+== How to Write a Module ==
+
 
 
 = Limitations =

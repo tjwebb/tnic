@@ -48,19 +48,18 @@ below is in Javascript.
     }
     function supervisor ($) {
         var n = 100;
-        if (($) !== null && $.space.counter >= n) {
+        if ($.space.counter >= n) {
             return false;
         }
-        else if (space !== null) {
-            // if prime, add the fib output to prime_list
-            if ($.prime.result) {
+        else {
+            if (true === $.prime.result) {
                 $.space.prime_list.add(space.fib.result);
             }
             return $.space.counter++;
         }
     }
     function join (space) {
-        print ("The fibonacci primes < "+ n +" are: "+ $.prime_list.toSource());
+        print ("The fibonacci primes < "+ n +" are: "+ $.prime_list);
     }
     function fail (space) {
         print ("The execution of this program timed out");
@@ -108,7 +107,7 @@ be invoked, i.e. "prime".
 Now, we'll go through each piece in detail so that you can begin writing your 
 own TNIC programs.
 
-==== Guard Object ====
+=== Guard Object ===
 {{{
 {
     "moduleA" : {
@@ -119,15 +118,8 @@ own TNIC programs.
 }
 }}}
 The object is keyed by module, so here we are defining the guard template for
-"moduleA". In the case of
-{{{
-    guard : "moduleB"
-}}}
-we are instructing moduleA to wait
-until moduleB is finished executing, and to only run if
-{{{
-    (z == 1)
-}}} 
+"moduleA". In the case of `guard : "moduleB"` we are instructing moduleA to wait
+until moduleB is finished executing, and to only run if `(z == 1)`
 evaluates to true. When defining a condition ("cond"), the argument z that is
 passed into the condition function is the result from the previous module--in
 this case, z is the result returned by moduleB. Generally, the supervisor will
@@ -139,11 +131,86 @@ default, wait until resources are available to execute. Even though the
 distributed nature of the system is designed to avoid such situations, this
 is necessary to ensure orderly execution of TNIC programs.
 
-==== Logic Flow ====
+=== Logic Flow ===
 The structure returned by init() defines the flow of logic. By default, the
 arguments passed into a function
 
-==== The '$' Variable ====
+
+=== How to Write A Supervisor ===
+The supervisor is a special module that directs the execution of its
+subordinate modules. The supervisor module consists of two functions: init()
+and supervisor().
+
+==== init() function ====
+The init function returns a hash-table object (aka JSON) that directs the flow
+of the program, and the items allowed in the object space. The table is keyed
+by module name. It is copied below for easy reference:
+{{{
+{
+    "com.tnic.example.fib" : {
+        guard : [ "com.tnic.example.supervisor" ],
+    },
+    "com.tnic.example.prime" : {
+        guard : [ "com.tnic.example.fib" ],
+        cond  : function (z) { return (z < 10000); }
+    }
+    "space" : {
+        prime_list : [ ],
+        counter    : 0
+    }
+}
+}}}
+===== _Guard Templates_ =====
+
+Let's take the key `com.tnic.exmaple.prime` as an example. It contains two
+properties: `guard` and `cond`. `guard` defines the modules upon which this
+module depends, and `cond` defines a precondition that must be satisfied if
+`prime` is to be invoked. If at any point in execution a condition defined by
+`cond` evaluates to false, the supervisor is immediately invoked.
+The English description of the guard template for `com.tnic.example.prime` is
+as follows: The `prime` module depends on the result of `com.tnic.example.fib`,
+so do not run until `fib` returns a result. As a precondition, however, the
+result of `fib` must be less than 10,000, so do not execute if z < 10000 is
+false.
+
+===== _Object Space Definition_ =====
+
+The `space` key in the hash-table allows the programmer to define a number of
+objects that will be available to the supervisor via `$.space` throughout the
+duration of the execution of the program. The use of this in the above example
+is straightforward. The programmer wants to maintain a list of all prime 
+numbers that have been discovered, so he maintains a prime_list that is 
+persistent until the program execution stops. This is opposed to a local
+variable instance, such as `var n = 100;` in `supervisor()`, that is not saved
+between each invocation of `supervisor()`. This design decision was made for
+illustration of this concept--in practice, `n` would probably be stored in 
+`$.space` as well.
+
+==== supervisor() function ====
+The supervisor handles all logic pertaining to beginning, ending, and/or
+looping the program. The supervisor is the first and last function to be 
+invoked in any tnic program. In addition, it is called once all modules are
+finished executing; if it returns true, the program will begin executing again,
+following the flow defined in `init()`. If it returns false, the program will
+stop. We'll similarly illustrate how the supervisor function works by utilizing
+the example from above, which is copied here:
+{{{
+function supervisor ($) {
+    var n = 100;
+    if ($.space.counter >= n) {
+        return false;
+    }
+    else {
+        if (true === $.prime.result) {
+            $.space.prime_list.add(space.fib.result);
+        }
+        $.space.counter++;
+        return true;
+    }
+}
+}}}
+
+===== _The `$` Variable_ =====
 The special variable, which we call '$', is passed into the supervisor function
 on its initial invocation, and on each subsequent call if applicable. It acts
 as a state object for the supervisor. '$' will always contain the following
@@ -159,13 +226,17 @@ properties:
         namespaces are accessible by using the full namespace as the key, e.g.
         $['com.tnic.packageA.moduleA'].result. 
 
-==== How to Write A Supervisor ====
+===== _The Return Value_ =====
+If `supervisor` returns true, the the program will execute following the flow
+defined in `init` via guard templates. If `supervisor` returns false, the
+program will terminate and the results in `$.space` will be saved.
+
 
 == Limitations ==
 In this section, we'll describe certain things that you cannot do with TNIC,
 or things that TNIC is not optimized for.
 
-==== Sustained, single-threaded execution ====
+=== Sustained, single-threaded execution ===
 TNIC is not designed for extended periods of single-threaded execution; TNIC is
 designed for distributed computation, and therefore your program modules
 should be as small as possible while retaining distinction and description.
@@ -173,7 +244,7 @@ It is for this reason that TNIC will kill a module if it executes for more than
 30 seconds. To be clear, a program comprised of many modules can run for as long
 as necessary, but the time-limit for an individual module is 30 seconds.
 
-==== Shared Data Structure ====
+=== Shared Data Structure ===
 As discussed earlier in this article, TNIC supervisors are in charge of
 maintaining program space. In the quick-start example, the supervisor receives
 a "space" variable as a function argument. The "space" variable structure has
@@ -187,15 +258,18 @@ structures that must transcend the execution of a single
 supervisor-->module-->supervisor cycle. *Note:* no matter what, the modules
 will simply not have access to any global variables you attempt to share.
 
-==== Tail Recursion ====
+=== Tail Recursion ===
 Tail recursion is possible in TNIC programs, but must be implemented carefully.
 The trivial tail-recursion example in the above example is acceptable for small
 numbers. For the example above, however, we stop at n = 100. For tail-recursive
 functions, there are two main issues to consider:
 
-* Direct function calls to other functions are not distributed; that is, they
-are run in the same thread and therefore do not take advantage of scaling
-* All threads are subject to the 30 second timeout, so it is important not to
-be under the illusion that you are not subject to the timeout just because
-you are calling another function. Since direct tail-recursion is
-single-threaded, tail-recursion *is* subject to a 30-second timeout.
+    * Direct function calls to other functions are not distributed; that is, they
+    are run in the same thread and therefore do not take advantage of scaling.
+
+    * All threads are subject to the 30 second timeout, so it is important not to
+    be under the illusion that you are not subject to the timeout just because
+    you are calling another function. Since direct tail-recursion is
+    single-threaded, tail-recursion *is* subject to a 30-second timeout. In addition,
+    you will not realize the benefit of paralleism because you'll only be utilizing
+    a single thread.

@@ -124,10 +124,6 @@ default, wait until resources are available to execute. Even though the
 distributed nature of the system is designed to avoid such situations, this
 is necessary to ensure orderly execution of TNIC programs.
 
-== Logic Flow ==
-The structure returned by `init()` defines the flow of logic. By default, the
-arguments passed into a function
-
 == How to Write A Supervisor ==
 The supervisor is a special module that directs the execution of its
 subordinate modules. The supervisor module consists of three functions: `init()`
@@ -262,12 +258,12 @@ The trivial tail-recursion example in the above example is acceptable for small
 numbers. For the example above, however, we stop at n = 100. For tail-recursive
 functions, there are two main issues to consider:
 
-    * Direct function calls to other functions are not distributed; that is, they
-        are run in the same thread and therefore do not take advantage of scaling.
+1. Direct function calls to other functions are not distributed; that is, they
+are run in the same thread and therefore do not take advantage of scaling.
 
-    * All threads are subject to the 30 second timeout, so it is important not to
-        be under the illusion that you are not subject to the timeout just because
-        you are calling another function. Since direct tail-recursion is
-        single-threaded, tail-recursion *is* subject to a 30-second timeout. In addition,
-        you will not realize the benefit of paralleism because you'll only be utilizing
-        a single thread.
+2. All threads are subject to the 30 second timeout, so it is important not to
+be under the illusion that you are not subject to the timeout just because
+you are calling another function. Since direct tail-recursion is
+single-threaded, tail-recursion *is* subject to a 30-second timeout. In addition,
+you will not realize the benefit of paralleism because you'll only be utilizing
+a single thread.

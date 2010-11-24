@@ -1,15 +1,13 @@
 #summary Describes how to write your own TNIC programs.
 
-= How to build your own TNIC Program  =
-
-== Background ==
+= Background =
 
 TNIC allows the implementor to develop programs that can be automatically
 distributed among different computing resources. Another goal of the project is
 to allow rapid prototyping and fail-safe modification of programs during
 runtime. 
 
-== Quick-Start ==
+= Quick-Start =
 
 We'll start with a simple example of a tnic program that finds all prime
 numbers in the fibonacci sequence. This program is split into two modules
@@ -22,9 +20,9 @@ functions, in that these functions are treated specially by the system. This
 special treatment is described below in How To Write A Supervisor. The example
 below is in Javascript.
 
-=== Example Code ===
+== Example Code ==
 
-==== Supervisor ====
+== Supervisor ==
 {{{
     /**
      * com.tnic.example.supervisor
@@ -52,7 +50,7 @@ below is in Javascript.
             return false;
         }
         else {
-            if (true === $.prime.result) {
+            if (true == $.prime.result) {
                 $.space.prime_list.add(space.fib.result);
             }
             return $.space.counter++;
@@ -65,7 +63,7 @@ below is in Javascript.
         print ("The execution of this program timed out");
     }
 }}}
-==== Fibonacci Module ====
+== Fibonacci Module ==
 {{{
     /**
      * com.tnic.example.fib
@@ -75,11 +73,11 @@ below is in Javascript.
      */
     namespace("com.tnic.example");
     function fib (n)
-        if (n == 0 || n == 1) return 1;
+        if (n = 0 || n = 1) return 1;
         return fib(n - 2) + fib(n - 1);
     }
 }}}
-==== Prime Number Validator Module ====
+== Prime Number Validator Module ==
 {{{
     /**
      * com.tnic.example.prime
@@ -90,13 +88,13 @@ below is in Javascript.
      namespace("com.tnic.example");
      function prime (num) {
         for (var i = 2; i <= sqrt(num); i++) {
-            if (num % i == 0) return false;
+            if (num % i = 0) return false;
         }
         return true;
      }
 }}}
 
-== Explanation ==
+= Explanation =
 To summarize again, this program finds all fibonacci primes up to 100. The
 execution begins with the supervisor. Once the supervisor function is finished,
 the module or modules with the supervisor as their guard will be invoked. In
@@ -107,19 +105,19 @@ be invoked, i.e. "prime".
 Now, we'll go through each piece in detail so that you can begin writing your 
 own TNIC programs.
 
-=== Guard Object ===
+== Guard Object ==
 {{{
 {
     "moduleA" : {
         guard : "moduleB"
-        cond  : function (z) { return (z == 1); }
+        cond  : function (z) { return (z = 1); }
     }
     ...
 }
 }}}
 The object is keyed by module, so here we are defining the guard template for
 "moduleA". In the case of `guard : "moduleB"` we are instructing moduleA to wait
-until moduleB is finished executing, and to only run if `(z == 1)`
+until moduleB is finished executing, and to only run if `(z = 1)`
 evaluates to true. When defining a condition ("cond"), the argument z that is
 passed into the condition function is the result from the previous module--in
 this case, z is the result returned by moduleB. Generally, the supervisor will
@@ -131,17 +129,17 @@ default, wait until resources are available to execute. Even though the
 distributed nature of the system is designed to avoid such situations, this
 is necessary to ensure orderly execution of TNIC programs.
 
-=== Logic Flow ===
+== Logic Flow ==
 The structure returned by init() defines the flow of logic. By default, the
 arguments passed into a function
 
 
-=== How to Write A Supervisor ===
+== How to Write A Supervisor ==
 The supervisor is a special module that directs the execution of its
 subordinate modules. The supervisor module consists of two functions: init()
 and supervisor().
 
-==== init() function ====
+== init() function ==
 The init function returns a hash-table object (aka JSON) that directs the flow
 of the program, and the items allowed in the object space. The table is keyed
 by module name. It is copied below for easy reference:
@@ -160,7 +158,7 @@ by module name. It is copied below for easy reference:
     }
 }
 }}}
-===== _Guard Templates_ =====
+=== _Guard Templates_ ===
 
 Let's take the key `com.tnic.exmaple.prime` as an example. It contains two
 properties: `guard` and `cond`. `guard` defines the modules upon which this
@@ -173,7 +171,7 @@ so do not run until `fib` returns a result. As a precondition, however, the
 result of `fib` must be less than 10,000, so do not execute if z < 10000 is
 false.
 
-===== _Object Space Definition_ =====
+=== _Object Space Definition_ ===
 
 The `space` key in the hash-table allows the programmer to define a number of
 objects that will be available to the supervisor via `$.space` throughout the
@@ -186,7 +184,7 @@ between each invocation of `supervisor()`. This design decision was made for
 illustration of this concept--in practice, `n` would probably be stored in 
 `$.space` as well.
 
-==== supervisor() function ====
+== supervisor() function ==
 The supervisor handles all logic pertaining to beginning, ending, and/or
 looping the program. The supervisor is the first and last function to be 
 invoked in any tnic program. In addition, it is called once all modules are
@@ -201,7 +199,7 @@ function supervisor ($) {
         return false;
     }
     else {
-        if (true === $.prime.result) {
+        if (true == $.prime.result) {
             $.space.prime_list.add(space.fib.result);
         }
         $.space.counter++;
@@ -210,7 +208,7 @@ function supervisor ($) {
 }
 }}}
 
-===== _The `$` Variable_ =====
+=== _The `$` Variable_ ===
 The special variable, which we call '$', is passed into the supervisor function
 on its initial invocation, and on each subsequent call if applicable. It acts
 as a state object for the supervisor. '$' will always contain the following
@@ -226,17 +224,17 @@ properties:
         namespaces are accessible by using the full namespace as the key, e.g.
         $['com.tnic.packageA.moduleA'].result. 
 
-===== _The Return Value_ =====
+=== _The Return Value_ ===
 If `supervisor` returns true, the the program will execute following the flow
 defined in `init` via guard templates. If `supervisor` returns false, the
 program will terminate and the results in `$.space` will be saved.
 
 
-== Limitations ==
+= Limitations =
 In this section, we'll describe certain things that you cannot do with TNIC,
 or things that TNIC is not optimized for.
 
-=== Sustained, single-threaded execution ===
+== Sustained, single-threaded execution ==
 TNIC is not designed for extended periods of single-threaded execution; TNIC is
 designed for distributed computation, and therefore your program modules
 should be as small as possible while retaining distinction and description.
@@ -244,7 +242,7 @@ It is for this reason that TNIC will kill a module if it executes for more than
 30 seconds. To be clear, a program comprised of many modules can run for as long
 as necessary, but the time-limit for an individual module is 30 seconds.
 
-=== Shared Data Structure ===
+== Shared Data Structure ==
 As discussed earlier in this article, TNIC supervisors are in charge of
 maintaining program space. In the quick-start example, the supervisor receives
 a "space" variable as a function argument. The "space" variable structure has
@@ -258,7 +256,7 @@ structures that must transcend the execution of a single
 supervisor-->module-->supervisor cycle. *Note:* no matter what, the modules
 will simply not have access to any global variables you attempt to share.
 
-=== Tail Recursion ===
+== Tail Recursion ==
 Tail recursion is possible in TNIC programs, but must be implemented carefully.
 The trivial tail-recursion example in the above example is acceptable for small
 numbers. For the example above, however, we stop at n = 100. For tail-recursive

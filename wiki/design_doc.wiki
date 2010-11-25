@@ -26,7 +26,6 @@ names. The example below is in Javascript.
      * com.tnic.example.supervisor
      * Return all prime numbers in the fibonacci sequence
      */
-    namespace("com.tnic.example");
     function init () {
         return {
             "com.tnic.example.fib" : {
@@ -66,7 +65,6 @@ names. The example below is in Javascript.
      * @param the previous number in the sequence
      * @return {integer} the next number in the sequence
      */
-    namespace("com.tnic.example");
     function fib (n)
         if (n == 0 || n == 1) return 1;
         return fib(n - 2) + fib(n - 1);
@@ -80,7 +78,6 @@ names. The example below is in Javascript.
      * @param the integer to process
      * @return true if prime, false otherwise
      */
-     namespace("com.tnic.example");
      function prime (num) {
         for (var i = 2; i <= sqrt(num); i++) {
             if (num % i == 0) return false;
@@ -93,9 +90,9 @@ names. The example below is in Javascript.
 To summarize again, this program finds all fibonacci primes up to 100. The
 execution begins with the supervisor. Once the supervisor function is finished,
 the module or modules with the supervisor as their guard will be invoked. In
-this example, one module is guarding on the supervisor: the "fib" module. 
-Likewise, once "fib" is done executing, all modules guarded on "fib" will
-be invoked, i.e. "prime".
+this example, one module is guarding on the supervisor: the `fib` module. 
+Likewise, once `fib` is done executing, all modules guarded on `fib` will
+be invoked, i.e. `prime`.
 
 Now, we'll go through each piece in detail so that you can begin writing your 
 own TNIC programs.
@@ -111,9 +108,9 @@ own TNIC programs.
 }
 }}}
 The object is keyed by module, so here we are defining the guard template for
-"moduleA". In the case of `guard : "moduleB"` we are instructing moduleA to wait
+`moduleA`. In the case of `guard : `moduleB` we are instructing moduleA to wait
 until moduleB is finished executing, and to only run if `(z == 1)`
-evaluates to true. When defining a condition ("cond"), the argument z that is
+evaluates to true. When defining a condition (`cond`), the argument z that is
 passed into the condition function is the result from the previous module--in
 this case, z is the result returned by moduleB. Generally, the supervisor will
 impose conditions on the modules that it guards on in order to halt the
@@ -197,9 +194,9 @@ function supervisor ($) {
 }}}
 
 ==== _The `$` Variable_ ====
-The special variable, which we call '$', is passed into the supervisor function
+The special variable, which we call `$`, is passed into the supervisor function
 on its initial invocation, and on each subsequent call if applicable. It acts
-as a state object for the supervisor. '$' will always contain the following
+as a state object for the supervisor. `$` will always contain the following
 properties:
     * space
         * a shared object-space that is persisted between module invocations
@@ -207,7 +204,7 @@ properties:
         * the namespace that the supervisor belongs to
     * (module name).result
         * in the example above, we check the $.fib.result object. This stores the 
-        value that 'fib' returned during it's last invocation. All modules in
+        value that `fib` returned during it's last invocation. All modules in
         the supervisor's namespace will be accessible in this way. Modules in other
         namespaces are accessible by using the full namespace as the key, e.g.
         $['com.tnic.packageA.moduleA'].result. 
@@ -244,12 +241,12 @@ as necessary, but the time-limit for an individual module is 30 seconds.
 == Shared Data Structure ==
 As discussed earlier in this article, TNIC supervisors are in charge of
 maintaining program space. In the quick-start example, the supervisor receives
-a "space" variable as a function argument. The "space" variable structure has
+a `space` variable as a function argument. The `space` variable structure has
 already been defined; its purpose is to place the responsibility of managing
 shared storage upon the supervisor. The modules should not attempt to create
 any global, shared data structures. All information passed between and shared
 among modules should be done in the function's return spacement. Since all
-returned results are inserted into the "space" variable and passed onto the
+returned results are inserted into the `space` variable and passed onto the
 supervisor, the supervisor should therefore properly maintain any data
 structures that must transcend the execution of a single 
 supervisor-->module-->supervisor cycle. *Note:* no matter what, the modules

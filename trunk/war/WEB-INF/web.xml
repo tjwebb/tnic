@@ -5,24 +5,15 @@
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
     <servlet>
-        <servlet-name>guestbook</servlet-name>
-        <servlet-class>guestbook.GuestbookServlet</servlet-class>
+        <servlet-name>jstest</servlet-name>
+        <servlet-class>com.tnic.test.JavascriptInterpreterTest</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>guestbook</servlet-name>
-        <url-pattern>/guestbook</url-pattern>
-    </servlet-mapping>
-
     <servlet>
-        <servlet-name>sign</servlet-name>
-        <servlet-class>guestbook.SignGuestbookServlet</servlet-class>
+        <servlet-name>javatest</servlet-name>
+        <servlet-class>com.tnic.test.JavaInterpreterTest</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>sign</servlet-name>
-        <url-pattern>/sign</url-pattern>
+        <servlet-name>javatest</servlet-name>
+        <url-pattern>/javatest</url-pattern>
     </servlet-mapping>
-
-    <welcome-file-list>
-        <welcome-file>guestbook.jsp</welcome-file>
-    </welcome-file-list>
 </web-app>

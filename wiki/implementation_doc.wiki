@@ -15,13 +15,13 @@ run.
 
 2. Understand the concepts behind tuple spaces and other methods of implementing
 shared memory on distributed systems.
-[http://en.wikipedia.org/wiki/Distributed_shared_memory]
-[http://en.wikipedia.org/wiki/Tuple_space]
+<br/>[http://en.wikipedia.org/wiki/Distributed_shared_memory]
+<br/>[http://en.wikipedia.org/wiki/Tuple_space]
 
 3. tnic uses the `javax.script` package for compilation and execution of Javascript
 modules, as well as Mozilla Rhino. Be familiar with these technologies.
-[http://download.oracle.com/javase/6/docs/technotes/guides/scripting/programmer_guide/]
-[http://www.mozilla.org/rhino/]
+<br/>[http://download.oracle.com/javase/6/docs/technotes/guides/scripting/programmer_guide/]
+<br/>[http://www.mozilla.org/rhino/]
 
 = Compiling and Initiating Execution of a TNIC Program =
 

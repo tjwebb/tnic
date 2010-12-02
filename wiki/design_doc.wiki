@@ -218,10 +218,6 @@ barrier synchronization. The tnic `join` function is simple invoked once the
 supervisor returns `false` because at this point all other modules have
 necessarily completed execution and have exited.
 
-== How to Write a Module ==
-
-
-
 = Limitations =
 In this section, we'll describe certain things that you cannot do with TNIC,
 or things that TNIC is not optimized for.

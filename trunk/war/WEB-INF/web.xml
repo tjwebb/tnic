@@ -8,12 +8,8 @@
         <servlet-name>jstest</servlet-name>
         <servlet-class>com.tnic.test.JavascriptInterpreterTest</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>javatest</servlet-name>
-        <servlet-class>com.tnic.test.JavaInterpreterTest</servlet-class>
-    </servlet>
     <servlet-mapping>
-        <servlet-name>javatest</servlet-name>
-        <url-pattern>/javatest</url-pattern>
+        <servlet-name>jstest</servlet-name>
+        <url-pattern>/jstest</url-pattern>
     </servlet-mapping>
 </web-app>

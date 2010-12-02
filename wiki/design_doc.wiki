@@ -204,10 +204,10 @@ properties:
         * the namespace that the supervisor belongs to
     * (module name).result
         * in the example above, we check the $.fib.result object. This stores the 
-        value that `fib` returned during it's last invocation. All modules in
-        the supervisor's namespace will be accessible in this way. Modules in other
-        namespaces are accessible by using the full namespace as the key, e.g.
-        $['com.tnic.packageA.moduleA'].result. 
+          value that `fib` returned during it's last invocation. All modules in
+          the supervisor's namespace will be accessible in this way. Modules in other
+          namespaces are accessible by using the full namespace as the key, e.g.
+          $['com.tnic.packageA.moduleA'].result. 
 
 ==== _The Return Value_ ====
 If `supervisor` returns true, the the program will execute following the flow

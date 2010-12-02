@@ -25,7 +25,7 @@ modules, as well as Mozilla Rhino. Be familiar with these technologies.
 
 = Compiling and Initiating Execution of a TNIC Program =
 
-== Step 1: Assemble Package Tree ==
+== Step 1: Assemble Package Tree and Resolve Dependencies ==
 
 == Step 2: Compile Sources==
 

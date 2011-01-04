@@ -1,3 +1,56 @@
+Version 1.4.0
+=============
+- The Always On feature allows applications to pay and keep 3 instances of their
+  application always running, which can significantly reduce application
+  latency.
+- Developers can now enable Warmup Requests. By specifying  a handler in an
+  app's appengine-web.xml, App Engine will attempt to send a Warmup Request to
+  initialize new instances before a user interacts with it. This can reduce the
+  latency an end-user sees for initializing your application.
+- The Channel API is now available for all users.
+- Task Queue has been officially released, and is no longer an experimental
+  feature. The API import paths that use 'labs' have been deprecated. Task queue
+  storage will count towards an application's overall storage quota, and will
+  thus be charged for.
+- The deadline for Task Queue and Cron requests has been raised to 10 minutes.
+  Datastore and API deadlines within those requests remain unchanged.
+- For the Task Queue, developers can specify task retry-parameters in their
+  queue.xml.
+- Apps that have enabled billing are allowed up to 100 queues with the Task
+  Queue API.
+- Metadata Queries on the datastore for datastore kinds, namespaces, and entity
+  properties are available.
+- URL Fetch allowed response size has been increased, up to 32 MB. Request size
+  is still limited to 1 MB.
+- The request and response sizes for the Images API have been increased to
+  32 MB.
+- The total size of Memcache batch operations is increased to 32 MB. The 1 MB
+  limit on individual Memcache objects still applies.
+- The attachment size for outgoing emails has been increased from 1 MB to 10 MB.
+  The size limit for incoming emails is still 10 MB. 
+- Size and quantity limits on datastore batch get/put/delete operations have
+  been removed. Individual entities are still limited to 1 MB, but your app may
+  batch as many entities together for get/put/delete calls as the overall
+  datastore deadline will allow for.
+- When iterating over query results, the datastore will now asynchronously
+  prefetch results, reducing latency in many cases by 10-15%.
+- The Admin Console Blacklist page lists the top blacklist rejected visitors.
+- The automatic image thumbnailing service supports arbitrary crop sizes up to
+  1600px.
+- Overall average instance latency in the Admin Console is now a weighted
+  average over QPS per instance.
+- Added a low-level AysncDatastoreService for making calls to the datastore
+  asynchronously.
+- Added a getBodyAsBytes() method to QueueStateInfo.TaskStateInfo, this returns
+  the body of the task state as a pure byte-string.
+- The whitelist has been updated to include all classes from javax.xml.soap.
+- Fixed an issue sending email to multiple recipients.
+    http://code.google.com/p/googleappengine/issues/detail?id=1623
+- Revert the default logging level during GWT hosted mode back to INFO.
+    http://code.google.com/p/googleappengine/issues/detail?id=4011
+- Fixed an issue with OpenId over SSL.
+  http://code.google.com/p/googleappengine/issues/detail?id=3393
+
 Version 1.3.8
 =============
 - You can run task queue tasks immediately from the admin console.

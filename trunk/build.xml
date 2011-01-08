@@ -1,4 +1,4 @@
-<project name="Guestbook" default="datanucleusenhance">
+<project name="tnic-editor" default="datanucleusenhance">
   <property name="sdk.dir" location="appengine-java-sdk" />
 
   <import file="${sdk.dir}/config/user/ant-macros.xml" />
@@ -35,12 +35,12 @@
       description="Compiles Java source and copies other source files to the WAR.">
     <mkdir dir="war/WEB-INF/classes" />
     <copy todir="war/WEB-INF/classes">
-      <fileset dir="java/src">
+      <fileset dir="src">
         <exclude name="**/*.java" />
       </fileset>
     </copy>
     <javac
-        srcdir="java/src"
+        srcdir="src"
         destdir="war/WEB-INF/classes"
         classpathref="project.classpath"
         debug="on" />

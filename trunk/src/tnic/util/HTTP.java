@@ -1,4 +1,4 @@
-package com.tnic.util;
+package tnic.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;

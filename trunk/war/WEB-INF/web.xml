@@ -5,12 +5,23 @@
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
     <servlet>
+        <servlet-name>editor_server</servlet-name>
+        <servlet-class>tnic.editor.Servlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>editor_server</servlet-name>
+        <url-pattern>/editor_server</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- test servlets below here -->
+    <servlet>
         <servlet-name>jstest</servlet-name>
-        <servlet-class>com.tnic.test.JavascriptInterpreterTest</servlet-class>
+        <servlet-class>tnic.test.JavascriptInterpreterTest</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>vfstest</servlet-name>
-        <servlet-class>com.tnic.editor.Servlet</servlet-class>
+        <servlet-class>tnic.editor.Servlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>jstest</servlet-name>

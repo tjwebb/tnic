@@ -1,4 +1,4 @@
-package com.tnic.test;
+package tnic.test;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

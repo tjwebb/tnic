@@ -1,4 +1,4 @@
-package com.tnic.jsvm;
+package tnic.jsvm;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;

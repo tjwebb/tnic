@@ -1,4 +1,4 @@
-package com.tnic.config;
+package tnic.config;
 
 public class InvalidConfigurationException extends Exception {
     public InvalidConfigurationException (String message) {

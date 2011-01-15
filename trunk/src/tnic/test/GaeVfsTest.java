@@ -1,4 +1,4 @@
-package com.tnic.test;
+package tnic.test;
 
 import java.io.*;
 

@@ -1,4 +1,6 @@
-package com.tnic.fs;
+package tnic.fs;
+
+import tnic.cache.AppEngineMemcache;
 
 import org.apache.commons.vfs.*;
 import org.apache.commons.io.IOUtils;
@@ -13,7 +15,7 @@ public class TnicFileSystem {
     static {
         try {
             GaeVFS.setRootPath(
-                com.tnic.config.Env.SERVLET_CONTEXT.getRealPath( "/" )
+                tnic.config.Env.SERVLET_CONTEXT.getRealPath( "/" )
             );
             Manager = GaeVFS.getManager();
         }
@@ -26,9 +28,14 @@ public class TnicFileSystem {
      * @return Contents of the file as a String
      */
     public static String getAsciiFile(String path) throws IOException {
-        return IOUtils.toString(
+        String file = AppEngineMemcache.get(path).toString();
+        if (file != null) return file;
+
+        file = IOUtils.toString(
             Manager.resolveFile(path).getContent().getInputStream()
         );
+        AppEngineMemcache.put(path, (Serializable)file);
+        return file;
     }
 
     /**
@@ -45,5 +52,6 @@ public class TnicFileSystem {
             file.getContent().getOutputStream()
         );
         file.close();
+        AppEngineMemcache.put(path, contents);
     }
 }

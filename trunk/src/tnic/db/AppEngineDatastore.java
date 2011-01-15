@@ -1,4 +1,4 @@
-package com.tnic.db;
+package tnic.db;
 
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-public class AppEngineDatastore implements Datastore {
+public class AppEngineDatastore {
     private static class PMF {
         private static final PersistenceManagerFactory pmfInstance =
             JDOHelper.getPersistenceManagerFactory("transactions-optional");

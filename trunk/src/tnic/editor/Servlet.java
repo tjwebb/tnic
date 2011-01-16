@@ -25,7 +25,7 @@ public class Servlet extends HttpServlet {
     public void doGet (HttpServletRequest req, HttpServletResponse res) 
             throws ServletException, IOException {
 
-        res.setContentType("text/plain");
+        res.setContentType("text/javascript");
 
         try {
             String fileName = req.getParameter("f");

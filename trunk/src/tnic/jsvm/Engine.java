@@ -58,11 +58,11 @@ public class Engine {
      * @param argv      A collection of arguments
      * @return result of script evaluation
      */
-    public static Object eval (CompiledScript script, String argv) {
+    public static String eval (CompiledScript script, String argv) {
         try {
             script.eval();
             return ((Invocable)script.getEngine())
-                .invokeFunction("run", (Object)argv);
+                .invokeFunction("run", (Object)argv).toString();
         }
         catch (ScriptException se) {
             return null;

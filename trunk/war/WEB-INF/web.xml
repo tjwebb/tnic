@@ -8,9 +8,18 @@
         <servlet-name>editor_server</servlet-name>
         <servlet-class>tnic.editor.Servlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>run</servlet-name>
+        <servlet-class>tnic.jsvm.Servlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>editor_server</servlet-name>
         <url-pattern>/editor_server</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>run</servlet-name>
+        <url-pattern>/run</url-pattern>
     </servlet-mapping>
 
 

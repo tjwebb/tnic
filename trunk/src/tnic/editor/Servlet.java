@@ -17,6 +17,7 @@ public class Servlet extends HttpServlet {
 
     public void init () throws ServletException {
         tnic.config.Env.SERVLET_CONTEXT = getServletContext();
+
     }
 
     /**
@@ -25,14 +26,14 @@ public class Servlet extends HttpServlet {
     public void doGet (HttpServletRequest req, HttpServletResponse res) 
             throws ServletException, IOException {
 
-        res.setContentType("text/javascript");
+        res.setContentType("text/plain");
 
         try {
             String fileName = req.getParameter("f");
             res.getWriter().println(TnicFileSystem.getAsciiFile(fileName));
         }
-        catch (Exception ex) {
-            res.getWriter().println("File Not Found");
+        catch (NullPointerException ex) {
+            res.getWriter().print("File Not Found");
             Env.log.severe (ex.toString());
         }
         finally {

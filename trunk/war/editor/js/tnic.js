@@ -189,19 +189,26 @@ var tnic = (function () {
 //            applyKeyHandlers();
 //            applyNullHandlers();
         },
-        save : function (newFile) {
-            var filename = $('#open_file').val()
-            if (newFile) {
-                editor.setCode('');
+        save : function (flag) {
+            if (flag) {
+                console.log("-> New File");
+                var filename = $('#open_file').val()
+            //    editor.setCode('');
                 currentFile = filename;
             }
-            else if (currentFile === null) return;
+            if (currentFile === null) {
+                console.log("currentFile === null");
+                return;
+            }
             var url = baseUrl + "f=" + currentFile;
+            console.log(url);
+            console.log(currentFile);
             $.ajax({
                 url : url,
                 type : "POST",
                 data : { c : editor.getCode() },
                 success : function (msg) {
+                    console.log(msg);
                     $('#currentFile').html(currentFile);
                 }
             });
@@ -222,7 +229,7 @@ var tnic = (function () {
             $.ajax({
                 url : url,
                 success : function (msg) {
-                    if (msg == "File Not Found") {
+                    if (msg != "File Not Found") {
                         currentFile = filename;
                     }
                     editor.setCode(msg);

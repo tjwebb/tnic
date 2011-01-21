@@ -1,5 +1,7 @@
 package tnic.jsvm;
 
+import tnic.config.Env;
+
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.Invocable;
@@ -13,7 +15,7 @@ import javax.script.ScriptException;
 public class Engine {
     private static String WRAPPER_PREFIX =
         "function run ($argv_string) {"
-      +     "importPackage(tnic.util);"
+//      +     "importPackage(tnic.util);"
       +     "var $argv = eval($argv_string);"
       +     "return ("
     ;
@@ -46,7 +48,7 @@ public class Engine {
             );
         }
         catch (ScriptException ex) {
-            System.err.println(ex.toString());
+            Env.log.severe(ex.toString());
             return null;
         }
     }
@@ -65,9 +67,11 @@ public class Engine {
                 .invokeFunction("run", (Object)argv).toString();
         }
         catch (ScriptException se) {
+            Env.log.severe(se.toString());
             return null;
         }
         catch (NoSuchMethodException nsme) {
+            Env.log.severe(nsme.toString());
             return null;
         }
     }

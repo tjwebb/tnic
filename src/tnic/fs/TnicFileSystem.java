@@ -1,10 +1,14 @@
 package tnic.fs;
 
 import tnic.cache.AppEngineMemcache;
+import tnic.jsvm.Engine;
+import tnic.config.Env;
 
 import org.apache.commons.vfs.*;
 import org.apache.commons.io.IOUtils;
 import com.newatlanta.commons.vfs.provider.gae.GaeVFS;
+
+import javax.script.CompiledScript;
 
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -19,7 +23,9 @@ public class TnicFileSystem {
             );
             Manager = GaeVFS.getManager();
         }
-        catch (Exception e) { }
+        catch (Exception e) {
+            Env.log.severe(e.toString());
+        }
     }
 
     /**
@@ -27,15 +33,37 @@ public class TnicFileSystem {
      * @param path  The path of the file to retrieve
      * @return Contents of the file as a String
      */
-    public static String getAsciiFile(String path) throws IOException {
-        String file = AppEngineMemcache.get(path).toString();
-        if (file != null) return file;
+    public static String getAsciiFile (String path) 
+            throws IOException {
+        String file = (String)AppEngineMemcache.get(path);
+        if (file == null) {
+            file = IOUtils.toString(
+                Manager.resolveFile(path).getContent().getInputStream()
+            );
+            AppEngineMemcache.put(path, file);
+        }
+        return file.toString();
+    }
 
-        file = IOUtils.toString(
-            Manager.resolveFile(path).getContent().getInputStream()
-        );
-        AppEngineMemcache.put(path, (Serializable)file);
-        return file;
+    /**
+     * Get a compiled script from the filesystem.
+     */
+    public static CompiledScript getCompiledScript (String path)
+            throws IOException {
+        CompiledScript script = null;
+        try {
+            script = (CompiledScript)AppEngineMemcache.get(path);
+        }
+        catch (ClassCastException cce) {
+            script = null;
+        }
+        if (script == null) {
+            String file = getAsciiFile(path);
+            script = Engine.compile(file);
+
+            AppEngineMemcache.put(path, (Serializable)script);
+        }
+        return script;
     }
 
     /**
@@ -53,5 +81,9 @@ public class TnicFileSystem {
         );
         file.close();
         AppEngineMemcache.put(path, contents);
+    }
+
+    public static void cleanup () {
+        GaeVFS.clearFilesCache();
     }
 }

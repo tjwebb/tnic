@@ -2,13 +2,12 @@ package tnic.fs;
 
 import tnic.cache.AppEngineMemcache;
 import tnic.jsvm.Engine;
+import tnic.jsvm.CompiledScript;
 import tnic.config.Env;
 
 import org.apache.commons.vfs.*;
 import org.apache.commons.io.IOUtils;
 import com.newatlanta.commons.vfs.provider.gae.GaeVFS;
-
-import javax.script.CompiledScript;
 
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -37,34 +36,42 @@ public class TnicFileSystem {
             throws IOException {
         String file = (String)AppEngineMemcache.get(path);
         if (file == null) {
+            Env.log.info("getAsciiFile() -> Cache miss");
             file = IOUtils.toString(
                 Manager.resolveFile(path).getContent().getInputStream()
             );
             AppEngineMemcache.put(path, file);
         }
-        return file.toString();
+        return file;
     }
 
     /**
      * Get a compiled script from the filesystem.
      */
+   
+    public static CompiledScript getCompiledScript (String path) {
+        return null;
+    }
+
+    /*
     public static CompiledScript getCompiledScript (String path)
             throws IOException {
         CompiledScript script = null;
         try {
-            script = (CompiledScript)AppEngineMemcache.get(path);
+            script = new CompiledScript(AppEngineMemcache.getByteStream(path));
         }
         catch (ClassCastException cce) {
             script = null;
         }
         if (script == null) {
-            String file = getAsciiFile(path);
-            script = Engine.compile(file);
+            String src = getAsciiFile(path);
+            script = Engine.compile(src);
 
-            AppEngineMemcache.put(path, (Serializable)script);
+            AppEngineMemcache.put(path, script.getSerializableScript());
         }
         return script;
     }
+    */
 
     /**
      * Store an ASCII file.

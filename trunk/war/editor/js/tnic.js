@@ -191,24 +191,19 @@ var tnic = (function () {
         },
         save : function (flag) {
             if (flag) {
-                console.log("-> New File");
                 var filename = $('#open_file').val()
-            //    editor.setCode('');
+                editor.setCode('');
                 currentFile = filename;
             }
             if (currentFile === null) {
-                console.log("currentFile === null");
                 return;
             }
             var url = baseUrl + "f=" + currentFile;
-            console.log(url);
-            console.log(currentFile);
             $.ajax({
                 url : url,
                 type : "POST",
                 data : { c : editor.getCode() },
                 success : function (msg) {
-                    console.log(msg);
                     $('#currentFile').html(currentFile);
                 }
             });

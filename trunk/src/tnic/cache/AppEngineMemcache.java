@@ -66,10 +66,8 @@ public class AppEngineMemcache {
      */
     public static Object get (String key) {
         if (!cache.containsKey(key)) return null;
-        
-        byte[] objectBytes = (byte[]) cache.get (key);
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream (objectBytes); 
+            ByteArrayInputStream bis = getStream(key);
             ObjectInputStream oin = new ObjectInputStream (bis);
         
             Object object = oin.readObject ();
@@ -84,6 +82,10 @@ public class AppEngineMemcache {
             Env.log.severe (e.toString ());
             return null;
         }
+    }
+
+    public static ByteArrayInputStream getStream (String key) {
+        return new ByteArrayInputStream((byte[]) cache.get (key));
     }
     /**
      * Deletes an object from memcache, and returns the object

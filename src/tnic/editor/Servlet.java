@@ -53,7 +53,7 @@ public class Servlet extends HttpServlet {
             String fileName     = req.getParameter("f");
             String fileContents = req.getParameter("c");
 
-            TnicFileSystem.storeAsciiFile(fileName, fileContents);
+            TnicFileSystem.storeAsciiFile(fileName, fileContents.trim());
         }
         catch (Exception ex) {
             res.getWriter().println("Fail");

@@ -11,16 +11,18 @@ import org.mozilla.javascript.Scriptable;
  * Creates the runtime environment for running tnic javascript programs.
  */
 public class Engine {
-    private static String WRAPPER_PREFIX =
-        "function run ($argv_string) {"
-      +     "importPackage(Packages.tnic.util);"
-      +     "var $argv = eval($argv_string);"
-      +     "return ("
+    private static String ARGV        = "$argv";
+    private static String ARGV_STRING = ARGV + "_string";
+    private static String WRAPPER_PREFIX_COMPILE_1 =
+        "function run ("+ ARGV +"_string) {"
     ;
-    private static String WRAPPER_SUFFIX = 
-            ").toSource(); "
-      + "}"
+    private static String WRAPPER_PREFIX_COMPILE_2 = "return ";
+    private static String IMPORT_AND_DEFINE = 
+        "importPackage(Packages.tnic.util);"
+      + "var "+ ARGV +" = eval("+ ARGV_STRING +");"
     ;
+    private static String WRAPPER_SUFFIX = ".toSource(); ";
+    private static String WRAPPER_SUFFIX_COMPILE = "}" ;
 
     /**
      * Compiles Javascript source. Wraps the source code inside a function
@@ -29,15 +31,70 @@ public class Engine {
      * @return CompiledScript instance
      */
     public static CompiledScript compile (String src) {
-        Env.log.info("compile/1: src: "+ src);
         Context cx = Context.enter();
         cx.initStandardObjects();
         try {
             return new CompiledScript(cx.compileFunction(
                 /* scope */  new ImporterTopLevel(cx),
-                /* source */ WRAPPER_PREFIX + src + WRAPPER_SUFFIX,
+                /* source */ prepare(src, false),
                 "RUN", 0, null
             ));
+        }
+        finally {
+            Context.exit();
+        }
+    }
+
+    /**
+     * Prepares the javascript source string for compilation.
+     */
+    private static String prepare (String core, boolean eval) {
+        String src = "";
+        if (!eval) {
+            src += WRAPPER_PREFIX_COMPILE_1;
+            src += IMPORT_AND_DEFINE;
+            src += WRAPPER_PREFIX_COMPILE_2;
+            src += scrub(core);
+            src += WRAPPER_SUFFIX;
+            src += WRAPPER_SUFFIX_COMPILE;
+        }
+        else {
+            src += IMPORT_AND_DEFINE;
+            src += scrub(core);
+            src += WRAPPER_SUFFIX;
+        }
+        return src;
+    }
+
+    /**
+     * Scrub the source code of macros, test code, and other things.
+     * TODO: implement
+     */
+    private static String scrub (String src) {
+        /* look for:
+            1.  // tnic: BEGIN
+                // ... code ...
+                // tnic: END
+            
+            2.  // tnic: NOEVAL
+            */
+        return src;
+    }
+    /**
+     * Evaluates Javascript source directly.
+     * @param src   The javascript source code as a String
+     * @returns the result of the script execution
+     */
+    public static String eval (String src, String argv) {
+        if (src == null) return null;
+        Context cx = Context.enter();
+        Scriptable scope = cx.initStandardObjects();
+        scope.setParentScope(new ImporterTopLevel(cx));
+        scope.put(ARGV_STRING, scope, (Object)argv);
+        
+        try {
+            return cx.evaluateString(scope, prepare(src, true), "RUN", 0, null)
+                .toString();
         }
         finally {
             Context.exit();

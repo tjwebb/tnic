@@ -39,6 +39,17 @@
         <exclude name="**/*.java" />
       </fileset>
     </copy>
+    <!-- 1. compile javascript dependencies -->
+    <javac
+        srcdir="src/tnic/util"
+        destdir="war/WEB-INF/classes"
+        classpathref="project.classpath"
+        debug="on" />
+    <!-- 2. compile javascript sources into java classes-->
+    <exec executable="/bin/bash">
+        <arg value="js_compile.sh" />
+    </exec>
+    <!-- 3. compile java sources -->
     <javac
         srcdir="src"
         destdir="war/WEB-INF/classes"

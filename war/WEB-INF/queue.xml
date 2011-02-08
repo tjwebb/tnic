@@ -1,0 +1,7 @@
+<queue-entries>
+    <queue>
+        <name>jsvm-thread-pool</name>
+        <rate>10/s</rate>
+        <bucket-size>1</bucket-size>
+    </queue>
+</queue-entries>

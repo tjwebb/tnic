@@ -2,7 +2,6 @@ package tnic.fs;
 
 import tnic.cache.AppEngineMemcache;
 import tnic.jsvm.Engine;
-import tnic.jsvm.CompiledScript;
 import tnic.config.Env;
 
 import org.apache.commons.vfs.*;
@@ -42,36 +41,8 @@ public class TnicFileSystem {
             );
             AppEngineMemcache.put(path, file);
         }
-        return file;
+        return ("".equals(file)) ? null : file;
     }
-
-    /**
-     * Get a compiled script from the filesystem.
-     */
-   
-    public static CompiledScript getCompiledScript (String path) {
-        return null;
-    }
-
-    /*
-    public static CompiledScript getCompiledScript (String path)
-            throws IOException {
-        CompiledScript script = null;
-        try {
-            script = new CompiledScript(AppEngineMemcache.getByteStream(path));
-        }
-        catch (ClassCastException cce) {
-            script = null;
-        }
-        if (script == null) {
-            String src = getAsciiFile(path);
-            script = Engine.compile(src);
-
-            AppEngineMemcache.put(path, script.getSerializableScript());
-        }
-        return script;
-    }
-    */
 
     /**
      * Store an ASCII file.

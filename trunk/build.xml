@@ -44,7 +44,9 @@
         srcdir="src/tnic/util"
         destdir="war/WEB-INF/classes"
         classpathref="project.classpath"
-        debug="on" />
+        debug="on" >
+        <compilerarg value="-Xlint:unchecked" />
+    </javac>
     <!-- 2. compile javascript sources into java classes-->
     <exec executable="/bin/bash">
         <arg value="js_compile.sh" />

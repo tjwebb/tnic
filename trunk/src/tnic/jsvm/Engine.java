@@ -3,6 +3,7 @@ package tnic.jsvm;
 import tnic.config.Env;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
@@ -19,6 +20,7 @@ public class Engine {
     private static String WRAPPER_PREFIX_COMPILE_2 = "return ";
     private static String IMPORT_AND_DEFINE = 
         "importPackage(Packages.tnic.util);"
+      + "importPackage(Packages.tnic.config);"
       + "var "+ ARGV +" = eval("+ ARGV_STRING +");"
     ;
     private static String WRAPPER_SUFFIX = ".toSource(); ";
@@ -48,38 +50,24 @@ public class Engine {
     /**
      * Prepares the javascript source string for compilation.
      */
-    private static String prepare (String core, boolean eval) {
+    public static String prepare (String core, boolean eval) {
         String src = "";
         if (!eval) {
             src += WRAPPER_PREFIX_COMPILE_1;
             src += IMPORT_AND_DEFINE;
             src += WRAPPER_PREFIX_COMPILE_2;
-            src += scrub(core);
+            src += core;
             src += WRAPPER_SUFFIX;
             src += WRAPPER_SUFFIX_COMPILE;
         }
         else {
             src += IMPORT_AND_DEFINE;
-            src += scrub(core);
+            src += core;
             src += WRAPPER_SUFFIX;
         }
         return src;
     }
 
-    /**
-     * Scrub the source code of macros, test code, and other things.
-     * TODO: implement
-     */
-    private static String scrub (String src) {
-        /* look for:
-            1.  // tnic: BEGIN
-                // ... code ...
-                // tnic: END
-            
-            2.  // tnic: NOEVAL
-            */
-        return src;
-    }
     /**
      * Evaluates Javascript source directly.
      * @param src   The javascript source code as a String
@@ -95,6 +83,9 @@ public class Engine {
         try {
             return cx.evaluateString(scope, prepare(src, true), "RUN", 0, null)
                 .toString();
+        }
+        catch (EvaluatorException ex) {
+            return null;
         }
         finally {
             Context.exit();
@@ -122,10 +113,21 @@ public class Engine {
         }
     }
 
-    public static String eval (Class module) {
-        return null;
+    /**
+     * Evaluates a compiled Javascript class.
+     */
+    public static String eval (Class module, String argv) {
+        try {
+            return module.getMethod("run", Object.class).invoke(
+                /* instance */  module.newInstance(),
+                /* args */      argv
+            ).toString();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-
 
     /**
      * Attempt to locate a compiled javascript class
@@ -139,5 +141,15 @@ public class Engine {
         catch (ClassNotFoundException ce) {
             return null;
         }
+    }
+
+    /**
+     * Construct a standard error message as JSON
+     * @param err The error code
+     * @param msg The error message
+     * @return JSON string of error
+     */
+    public static String error (int err, String msg) {
+        return "({ error : "+ err +", msg: \""+ msg +"\" })";
     }
 }

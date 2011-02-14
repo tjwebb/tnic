@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 
 public class HTTP {
+   /**
+    * Send an HTTP GET request.
+    */
    public static String get (String urlStr) {
         try {
             StringBuilder buf = new StringBuilder();
@@ -28,9 +31,7 @@ public class HTTP {
         }
         return null;
    }
-   /*
-   public static byte[] binaryGet (urlStr) {
-
+   public static String post (String urlStr) {
+        return null;
    }
-   */
 }

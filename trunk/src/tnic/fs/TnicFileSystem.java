@@ -10,15 +10,13 @@ import com.newatlanta.commons.vfs.provider.gae.GaeVFS;
 
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.io.*;
+import java.io.ByteArrayInputStream;
 
 public class TnicFileSystem {
     public static FileSystemManager Manager;
     static {
         try {
-            GaeVFS.setRootPath(
-                tnic.config.Env.SERVLET_CONTEXT.getRealPath( "/" )
-            );
+            GaeVFS.setRootPath(Env.SERVLET_CONTEXT.getRealPath( "/" ));
             Manager = GaeVFS.getManager();
         }
         catch (Exception e) {
@@ -35,7 +33,6 @@ public class TnicFileSystem {
             throws IOException {
         String file = (String)AppEngineMemcache.get(path);
         if (file == null) {
-            Env.log.info("getAsciiFile() -> Cache miss");
             file = IOUtils.toString(
                 Manager.resolveFile(path).getContent().getInputStream()
             );

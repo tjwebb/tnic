@@ -45,18 +45,27 @@
         destdir="war/WEB-INF/classes"
         classpathref="project.classpath"
         debug="on" >
-        <compilerarg value="-Xlint:unchecked" />
     </javac>
     <!-- 2. compile javascript sources into java classes-->
     <exec executable="/bin/bash">
-        <arg value="js_compile.sh" />
+        <arg value="scripts/js_compile.sh" />
     </exec>
     <!-- 3. compile java sources -->
     <javac
         srcdir="src"
         destdir="war/WEB-INF/classes"
         classpathref="project.classpath"
-        debug="on" />
+        debug="on" >
+        <!-- <compilerarg value="-Xlint" /> -->
+    </javac>
+  </target>
+
+
+  <target name="js" description="Run a js file in rhino">
+    <exec executable="/bin/bash">
+        <arg value="scripts/js_run.sh" />
+        <arg value="${file}" />
+    </exec>
   </target>
 
   <target name="datanucleusenhance" depends="compile"

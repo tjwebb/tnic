@@ -1,0 +1,1 @@
+TNIC (pronounced 'Tonic') leverages the Google App Engine as a central computing resource in a distributed system. The goal of this framework is to simplify the development of GAE-based data aggregation applications. This project employs map reduce to distribute work among discrete user-developed Javascript modules in order to aggregate data from multiple data sources.
